@@ -1,46 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Divider,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
-import './styles.css';
+import "./styles.css";
 
 function UserList() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3001/user/list")
+      .then((response) => {
+        setUsers(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching user list:", error);
+      });
+  }, []); // Empty dependency array means this runs once on mount
+
   return (
     <div>
-      <Typography variant="body1">
-        This is the user list, which takes up 3/12 of the window. You might
-        choose to use
-        {' '}
-        <a href="https://mui.com/components/lists/" rel="noreferrer" target="_blank">Lists</a>
-        {' '}
-        and
-        {' '}
-        <a href="https://mui.com/components/dividers/" rel="noreferrer" target="_blank">Dividers</a>
-        {' '}
-        to
-        display your users like so:
-      </Typography>
+      <Typography variant="h6">Users</Typography>
       <List component="nav">
-        <ListItem>
-          <ListItemText primary="Item #1" />
-        </ListItem>
-        <Divider />
-        <ListItem>
-          <ListItemText primary="Item #2" />
-        </ListItem>
-        <Divider />
-        <ListItem>
-          <ListItemText primary="Item #3" />
-        </ListItem>
-        <Divider />
+        {users.map((user) => (
+          <React.Fragment key={user._id}>
+            <ListItemButton component={Link} to={`/users/${user._id}`}>
+              <ListItemText primary={`${user.first_name} ${user.last_name}`} />
+            </ListItemButton>
+            <Divider />
+          </React.Fragment>
+        ))}
       </List>
-      <Typography variant="body1">
-        The model comes in from API: /user/list
+      <Typography variant="body2" style={{ marginTop: 16 }}>
+        API Endpoint: /user/list
       </Typography>
     </div>
   );
